@@ -1,11 +1,13 @@
-import { ReactNode } from "react";
 import { Header } from "../Header";
+import { Outlet } from "react-router-dom";
 
-export const Layout = ({ children }: { children: ReactNode }) => {
+export const Layout = () => {
   return (
-    <div>
+    <div className='bg-light' style={{ minHeight: "100vh" }}>
       <Header />
-      <div className='container'>{children}</div>
+      <div className='container'>
+        <Outlet />
+      </div>
     </div>
   );
 };
