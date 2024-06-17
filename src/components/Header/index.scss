@@ -2,22 +2,33 @@
 
 .header-wrapper {
   background-color: $primary;
-  padding: 20px;
-  color: $white;
+  padding: 10px 20px;
+  border-bottom: 5px solid $secondary;
 
   .content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    a {
-      text-decoration: none;
-      color: unset;
-    }
-
+    
     h1 {
       font-size: 2.5rem;
       font-family: 'CherryBombOne';
+      text-decoration: none;
+      color: $white;
+    }
+
+    nav {
+      a {
+        color: $dark;
+        text-decoration: none;
+        font-size: 1.2rem;
+        margin-left: 2.5rem;
+        font-weight: bold;
+
+        &.active {
+          color: $white;
+        }
+      }
     }
   }
 }

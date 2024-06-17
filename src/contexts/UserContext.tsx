@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { ISignIn, signIn } from "../services/auth.service";
+import * as authService from "../services/auth.service";
 
 type User = {
   id: string;
@@ -8,12 +8,22 @@ type User = {
 };
 
 interface IUserContext {
-  login: (payload: ISignIn, onError?: Function) => Promise<void>;
+  login: (payload: authService.ISignIn, onError?: Function) => Promise<void>;
+  signUp: (
+    payload: authService.ISignUp,
+    onSuccess?: Function,
+    onError?: Function
+  ) => Promise<void>;
+  logout: () => void;
   user: User | undefined;
 }
 
+const ACCESS_TOKEN = "access_token";
+
 const defaultValues: IUserContext = {
   login: async (payload, onError) => {},
+  signUp: async (payload, onError) => {},
+  logout: () => {},
   user: undefined,
 };
 
@@ -22,43 +32,68 @@ export const UserContext = createContext(defaultValues);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User>();
 
-  const login = async (payload: ISignIn, onError?: Function) => {
+  const login = async (payload: authService.ISignIn, onError?: Function) => {
     try {
-      console.log("login");
-
-      const response = await signIn(payload);
-      console.log(response);
+      const response = await authService.signIn(payload);
 
       const access_token = response.data?.access_token;
       if (access_token) {
-        localStorage.setItem("access_token", access_token);
+        localStorage.setItem(ACCESS_TOKEN, access_token);
         const data = decodeToken(access_token);
-        setUser(data);
+        setUser({
+          email: data.email,
+          id: data.id,
+          name: data.name,
+        });
       }
     } catch (err) {
       if (onError) onError();
     }
   };
 
+  const logout = () => {
+    localStorage.removeItem(ACCESS_TOKEN);
+    setUser(undefined);
+  };
+
+  const signUp = async (
+    payload: authService.ISignUp,
+    onSuccess?: Function,
+    onError?: Function
+  ) => {
+    try {
+      await authService.signUp(payload);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.log(err);
+
+      if (onError) onError(err);
+    }
+  };
+
   const verifyLoggedIn = () => {
-    const access_token = localStorage.getItem("access_token");
+    const access_token = localStorage.getItem(ACCESS_TOKEN);
     if (access_token) {
       const data = decodeToken(access_token);
-      // Verificar se o token esta valido!!
-      if (data?.id && data.email && data.name) {
-        setUser({
-          id: data.id,
-          email: data.email,
-          name: data.name,
-        });
+      if (data) {
+        const notExpired = Date.now() < data.exp * 1000;
+        if (notExpired) {
+          setUser({
+            id: data.id,
+            email: data.email,
+            name: data.name,
+          });
+        } else {
+          localStorage.removeItem(ACCESS_TOKEN);
+        }
       }
     }
   };
 
   const decodeToken = (token: string) => {
-    var base64Url = token.split(".")[1];
-    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    var jsonPayload = decodeURIComponent(
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
       window
         .atob(base64)
         .split("")
@@ -67,16 +102,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         })
         .join("")
     );
-
-    console.log(jsonPayload);
-
     return JSON.parse(jsonPayload);
   };
 
   useEffect(verifyLoggedIn, []);
 
   return (
-    <UserContext.Provider value={{ user, login }}>
+    <UserContext.Provider value={{ user, login, logout, signUp }}>
       {children}
     </UserContext.Provider>
   );
