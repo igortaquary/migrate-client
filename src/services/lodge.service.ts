@@ -1,21 +1,31 @@
-import axios from "./service";
+import { Location } from "../types/location.types";
+import api from "./api";
 
 export const getLodge = (id: string) => {
-  return axios.get("/lodge/" + id);
+  return api.get("/lodge/" + id);
 };
 
 export const getUserLodges = () => {
-  return axios.get("/lodge/profile");
+  return api.get("/lodge/profile");
 };
 
-interface CreateLodgeDto {
+export interface CreateLodgeDto {
   title: string;
   description: string;
   type: number;
   space: number;
   institutionId: string;
+  location: Location;
 }
 
 export const createLodge = (payload: CreateLodgeDto) => {
-  return axios.post("/lodge", payload);
+  return api.post("/lodge", payload);
+};
+
+export const updateLodge = (id: string, payload: CreateLodgeDto) => {
+  return api.patch("/lodge/" + id, payload);
+};
+
+export const deleteLodge = (id: string) => {
+  return api.delete("/lodge/" + id);
 };

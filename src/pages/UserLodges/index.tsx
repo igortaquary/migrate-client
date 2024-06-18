@@ -26,11 +26,16 @@ export const UserLodges = () => {
 
   return (
     <div>
-      <h1 className='my-3'>Meus anúncios</h1>
+      <div className='d-flex align-items-center justify-content-between my-3'>
+        <h1 className='m-0'>Meus anúncios</h1>
+        <Link to={"create"} className='btn btn-secondary'>
+          + novo anúncio
+        </Link>
+      </div>
       {lodges.length ? (
         <div>
-          {lodges.map((lodge) => (
-            <UserLodgeCard lodge={lodge} />
+          {lodges.map((lodge, i) => (
+            <UserLodgeCard key={i} lodge={lodge} onDelete={handleFetch} />
           ))}
         </div>
       ) : (

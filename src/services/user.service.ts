@@ -1,4 +1,4 @@
-import axios from "./service";
+import axios from "./api";
 
 export const getProfile = () => {
   return axios.get("/profile");

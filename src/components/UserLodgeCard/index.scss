@@ -1,0 +1,11 @@
+@use '../../index.scss' as *;
+.user-lodge-card {
+  padding: 1rem;
+  color: $dark;
+  margin-bottom: 1rem;
+
+  a {
+    text-decoration: none;
+    color: unset;
+  }
+}

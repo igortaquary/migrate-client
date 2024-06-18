@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import axios from "./service";
+import api from "./api";
 
 export interface ISignIn {
   email: string;
@@ -7,7 +7,7 @@ export interface ISignIn {
 }
 
 export const signIn = (payload: ISignIn) => {
-  return axios.post("/auth/login", payload);
+  return api.post("/auth/login", payload);
 };
 
 export interface ISignUp {
@@ -20,7 +20,7 @@ export interface ISignUp {
 
 export const signUp = async (payload: ISignUp) => {
   try {
-    return await axios.post("/auth/sign-up", payload);
+    return await api.post("/auth/sign-up", payload);
   } catch (err) {
     const error = err as AxiosError;
     throw error.response?.data;
