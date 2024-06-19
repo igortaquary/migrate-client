@@ -1,0 +1,9 @@
+@use '../../index.scss' as *;
+
+.footer {
+  background-color: $secondary;
+  height: max-content;
+  margin-top: auto;
+  padding: 10px 20px;
+  color: $white;
+}

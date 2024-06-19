@@ -3,6 +3,7 @@ import { Loader } from "../../components/Loader";
 import { getUserLodges } from "../../services/lodge.service";
 import { IUserLodge, UserLodgeCard } from "../../components/UserLodgeCard";
 import { Link } from "react-router-dom";
+import showNotification from "../../components/GlobalAlert";
 
 export const UserLodges = () => {
   const [lodges, setLodges] = useState<IUserLodge[]>([]);
@@ -14,7 +15,7 @@ export const UserLodges = () => {
       setLodges(result.data);
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      showNotification("danger", "Não foi possível buscar os anúncios");
     }
   };
 

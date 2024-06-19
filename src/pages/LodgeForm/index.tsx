@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "react-bootstrap/esm/Button";
 import Col from "react-bootstrap/esm/Col";
@@ -10,6 +10,7 @@ import { createLodge, updateLodge } from "../../services/lodge.service";
 import { getAddessByCep } from "../../services/viacep";
 import { LodgeType, SpaceType } from "../../types/lodge.types";
 import { Location } from "../../types/location.types";
+import { getAllInstitutions } from "../../services/institution.service";
 
 interface IErrors {
   title?: string;
@@ -26,9 +27,14 @@ export const LodgeForm = () => {
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<IErrors>({});
 
+  const [institutions, setInstitutions] = useState<any[]>([]);
+
   const [title, setTitle] = useState(lodgeToEdit?.title || "");
   const [description, setDescription] = useState(
     lodgeToEdit?.description || ""
+  );
+  const [institution, setInstitution] = useState(
+    lodgeToEdit?.institution?.id || ""
   );
   const [type, setType] = useState<LodgeType>(lodgeToEdit?.type || 0);
   const [space, setSpace] = useState<SpaceType>(lodgeToEdit?.space || 0);
@@ -41,6 +47,11 @@ export const LodgeForm = () => {
 
   const setLocation = (attribute: keyof Location, value: string) => {
     setLocationObj({ ...location, [attribute]: value });
+  };
+
+  const handleGetInstitutions = async () => {
+    const result = await getAllInstitutions();
+    setInstitutions(result.data);
   };
 
   const handleZipCode = async () => {
@@ -81,7 +92,7 @@ export const LodgeForm = () => {
           space,
           type,
           location: { ...location } as Location,
-          institutionId: "57109e45-4061-483d-8e9f-8e308eb37d8d",
+          institutionId: institution || null,
         };
         if (lodgeToEdit) {
           await updateLodge(lodgeToEdit.id, payload);
@@ -97,6 +108,10 @@ export const LodgeForm = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    handleGetInstitutions();
+  }, []);
 
   if (success) return <Navigate to={"/my-lodges"} />;
 
@@ -164,6 +179,22 @@ export const LodgeForm = () => {
             <Form.Control.Feedback type='invalid'>
               {errors.description}
             </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group as={Col} md='12' className='mb-3'>
+            <Form.Label>Universidade/Campus</Form.Label>
+            <Form.Select
+              onChange={(e) => setInstitution(e.target.value)}
+              aria-label='Tipo de acomodação'
+              value={institution}
+            >
+              <option value={""}>Nenhum</option>
+              {institutions.map((institution, i) => (
+                <option key={i} value={institution.id}>
+                  {institution.name}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
         </Row>
         <hr className='my-5' />

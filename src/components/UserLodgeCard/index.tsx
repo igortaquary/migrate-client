@@ -43,7 +43,7 @@ export const UserLodgeCard = ({
         <div className='col-md-3'></div>
         <div className='col-md-5'>
           <b>{title}</b>
-          <p>{description}</p>
+          <p className='description'>{description}</p>
         </div>
         <div className='col-md-4'>
           <div className='gap-2 d-flex justify-content-end'>

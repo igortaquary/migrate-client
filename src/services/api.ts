@@ -1,4 +1,5 @@
 import axios from "axios";
+import showNotification from "../components/GlobalAlert";
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
@@ -16,15 +17,17 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-axios.interceptors.response.use(
+api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
+    console.log("interceptors error");
     if (error.response.status === 401) {
+      showNotification("danger", "Usuário não autorizado");
       window.location.href = "/login";
     }
-    return error;
+    throw error;
   }
 );
 

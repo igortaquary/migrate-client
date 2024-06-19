@@ -29,3 +29,7 @@ export const updateLodge = (id: string, payload: CreateLodgeDto) => {
 export const deleteLodge = (id: string) => {
   return api.delete("/lodge/" + id);
 };
+
+export const searchLodges = (page = 1) => {
+  return api.get("/lodge", { params: { page } });
+};

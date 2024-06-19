@@ -1,21 +1,55 @@
-import { Pagination } from "../../components/Pagination";
+import { useEffect, useState } from "react";
+import { IPagination, Pagination } from "../../components/Pagination";
+import { searchLodges } from "../../services/lodge.service";
+import { Loader } from "../../components/Loader";
+import { LodgeCard } from "../../components/LodgeCard";
+import { useSearchParams } from "react-router-dom";
+import "./index.scss";
 
 export const Lodges = () => {
-  const data = {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [lodges, setLodges] = useState([]);
+  const [pageData, setPageData] = useState<IPagination>({
     currentPage: 1,
-    lastPage: 1,
+    lastPage: 0,
+    nextPage: 0,
     prevPage: 0,
-    nextPage: 1,
+  });
+  const [loading, setLoading] = useState(true);
+
+  const handleSearch = async () => {
+    const page = Number(searchParams.get("page")) || 1;
+    const result = await searchLodges(page);
+    setLodges(result.data.data);
+    console.log(result.data);
+
+    setPageData(result.data);
+    setLoading(false);
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, [searchParams]);
+
+  if (loading) return <Loader />;
+
   return (
     <main>
-      <h1>Acomodações</h1>
-      <div></div>
+      <h1 className='my-3'>Acomodações</h1>
+      <div className='lodges-grid mb-4'>
+        {lodges.length ? (
+          lodges.map((lodge, i) => <LodgeCard key={i} lodge={lodge} />)
+        ) : (
+          <></>
+        )}
+      </div>
       <Pagination
-        currentPage={data.currentPage}
-        lastPage={data.lastPage}
-        nextPage={data.nextPage}
-        prevPage={data.prevPage}
+        currentPage={pageData.currentPage}
+        lastPage={pageData.lastPage}
+        nextPage={pageData.nextPage}
+        prevPage={pageData.prevPage}
+        setSearchParams={setSearchParams}
       />
     </main>
   );
