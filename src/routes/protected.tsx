@@ -4,7 +4,7 @@ import { UserContext } from "../contexts/UserContext";
 
 export const ProtectedRoute = () => {
   const userContext = useContext(UserContext);
-  if (!userContext.user) {
+  if (!userContext.loading && !userContext.user) {
     return <Navigate to={"/login"} />;
   }
 

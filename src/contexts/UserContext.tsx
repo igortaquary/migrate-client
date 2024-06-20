@@ -16,6 +16,7 @@ interface IUserContext {
   ) => Promise<void>;
   logout: () => void;
   user: User | undefined;
+  loading: boolean;
 }
 
 const ACCESS_TOKEN = "access_token";
@@ -25,12 +26,14 @@ const defaultValues: IUserContext = {
   signUp: async (payload, onError) => {},
   logout: () => {},
   user: undefined,
+  loading: true,
 };
 
 export const UserContext = createContext(defaultValues);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | undefined>(defaultValues.user);
+  const [loading, setLoading] = useState(defaultValues.loading);
 
   const login = async (payload: authService.ISignIn, onError?: Function) => {
     try {
@@ -88,6 +91,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     }
+    setLoading(false);
   };
 
   const decodeToken = (token: string) => {
@@ -108,7 +112,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(verifyLoggedIn, []);
 
   return (
-    <UserContext.Provider value={{ user, login, logout, signUp }}>
+    <UserContext.Provider value={{ user, loading, login, logout, signUp }}>
       {children}
     </UserContext.Provider>
   );

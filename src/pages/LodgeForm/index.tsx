@@ -8,7 +8,13 @@ import { Link, Navigate, useLocation } from "react-router-dom";
 
 import { createLodge, updateLodge } from "../../services/lodge.service";
 import { getAddessByCep } from "../../services/viacep";
-import { LodgeType, SpaceType } from "../../types/lodge.types";
+import {
+  ContactInfo,
+  Gender,
+  Lodge,
+  LodgeType,
+  SpaceType,
+} from "../../types/lodge.types";
 import { Location } from "../../types/location.types";
 import { getAllInstitutions } from "../../services/institution.service";
 
@@ -16,16 +22,18 @@ interface IErrors {
   title?: string;
   description?: string;
   server?: string;
-
-  location?: Partial<Location>;
+  price?: string;
 }
+
+interface IErrorsLocation extends Partial<Location> {}
 
 export const LodgeForm = () => {
   const { state } = useLocation();
-  const lodgeToEdit = state?.lodge;
+  const lodgeToEdit = state?.lodge as Lodge;
 
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<IErrors>({});
+  const [locationErrors, setLocationErrors] = useState<IErrorsLocation>({});
 
   const [institutions, setInstitutions] = useState<any[]>([]);
 
@@ -38,6 +46,13 @@ export const LodgeForm = () => {
   );
   const [type, setType] = useState<LodgeType>(lodgeToEdit?.type || 0);
   const [space, setSpace] = useState<SpaceType>(lodgeToEdit?.space || 0);
+  const [gender, setGender] = useState<Gender>(lodgeToEdit?.gender || "any");
+  const [contactInfo, setContactInfo] = useState<ContactInfo>(
+    lodgeToEdit?.contactInfo || "all"
+  );
+  const [price, setPrice] = useState<number | undefined>(
+    lodgeToEdit?.price || undefined
+  );
 
   const [location, setLocationObj] = useState<Partial<Location>>(
     lodgeToEdit?.location || {}
@@ -55,31 +70,43 @@ export const LodgeForm = () => {
   };
 
   const handleZipCode = async () => {
-    console.log(zipCode);
-    let err = errors;
-    err.location = err.location || {};
+    let err = locationErrors;
+
     if (/^\d{8}$/.test(zipCode)) {
       console.log("zipCode");
-      err.location.zipCode = "";
+      err.zipCode = "";
       if (lastZipCode !== zipCode) {
         setLastZipCode(zipCode);
         const result = await getAddessByCep(zipCode);
         if (result) setLocationObj(result);
       }
     } else {
-      err.location.zipCode = "CEP inválido. Apenas números";
+      err.zipCode = "CEP inválido. Apenas números";
     }
-    setErrors(err);
+    setLocationErrors(err);
   };
 
   const validate = () => {
-    let err: IErrors = {};
-    err.location = errors.location || {};
-    if (!title) err.title = "Preencha o titulo";
-    if (!location) err.server = "Forneça a localização da acomodação";
+    const err: IErrors = {};
+    const locErr: IErrorsLocation = {};
+    if (title.length < 5)
+      err.title = "O título do seu anúncio está muito curto";
+    if (description.length < 20)
+      err.description = "A descrição do seu anúncio está muito curta";
+    if (!location) err.server = "Preencha a localização da acomodação";
+
+    if (location) {
+      if (!location.address)
+        locErr.address = "Preencha o endereço da acomodação";
+      if (!location.district)
+        locErr.district = "Preencha o bairro da acomodação";
+      if (!location.city) locErr.city = "Preencha a cidade da acomodação";
+      if (!location.state) locErr.state = "Preencha a UF da acomodação";
+    }
 
     setErrors(err);
-    return Object.keys(err).length === 1;
+    setLocationErrors(locErr);
+    return Object.keys({ ...err, ...locErr }).length === 0;
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -91,6 +118,9 @@ export const LodgeForm = () => {
           description,
           space,
           type,
+          gender,
+          contactInfo,
+          price,
           location: { ...location } as Location,
           institutionId: institution || null,
         };
@@ -117,7 +147,7 @@ export const LodgeForm = () => {
 
   return (
     <main className='py-3'>
-      <h1 className='my-3'>Anúncio</h1>
+      <h1 className='my-3'>Anunciar acomodação</h1>
 
       <Form noValidate onSubmit={handleSubmit}>
         <Row className='mb-3'>
@@ -180,22 +210,6 @@ export const LodgeForm = () => {
               {errors.description}
             </Form.Control.Feedback>
           </Form.Group>
-
-          <Form.Group as={Col} md='12' className='mb-3'>
-            <Form.Label>Universidade/Campus</Form.Label>
-            <Form.Select
-              onChange={(e) => setInstitution(e.target.value)}
-              aria-label='Tipo de acomodação'
-              value={institution}
-            >
-              <option value={""}>Nenhum</option>
-              {institutions.map((institution, i) => (
-                <option key={i} value={institution.id}>
-                  {institution.name}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
         </Row>
         <hr className='my-5' />
         <h2 className='mb-3'>Localização</h2>
@@ -209,11 +223,11 @@ export const LodgeForm = () => {
               placeholder='Digite o CEP (apenas números)'
               onChange={(e) => setZipCode(e.target.value)}
               value={zipCode}
-              isInvalid={!!errors.location?.zipCode}
+              isInvalid={!!locationErrors?.zipCode}
               onBlur={handleZipCode}
             />
             <Form.Control.Feedback type='invalid'>
-              {errors.location?.zipCode}
+              {locationErrors?.zipCode}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -225,10 +239,10 @@ export const LodgeForm = () => {
               placeholder='Rua, avenida, etc.'
               onChange={(e) => setLocation("address", e.target.value)}
               value={location.address}
-              isInvalid={!!errors.location?.address}
+              isInvalid={!!locationErrors?.address}
             />
             <Form.Control.Feedback type='invalid'>
-              {errors.location?.address}
+              {locationErrors?.address}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -240,10 +254,10 @@ export const LodgeForm = () => {
               placeholder='Seu bairro'
               onChange={(e) => setLocation("district", e.target.value)}
               value={location.district}
-              isInvalid={!!errors.location?.district}
+              isInvalid={!!locationErrors?.district}
             />
             <Form.Control.Feedback type='invalid'>
-              {errors.location?.district}
+              {locationErrors?.district}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -255,10 +269,10 @@ export const LodgeForm = () => {
               placeholder='Brasília'
               onChange={(e) => setLocation("city", e.target.value)}
               value={location.city}
-              isInvalid={!!errors.location?.city}
+              isInvalid={!!locationErrors?.city}
             />
             <Form.Control.Feedback type='invalid'>
-              {errors.location?.city}
+              {locationErrors?.city}
             </Form.Control.Feedback>
           </Form.Group>
 
@@ -269,20 +283,99 @@ export const LodgeForm = () => {
               type='text'
               maxLength={2}
               placeholder='UF'
-              onChange={(e) => setLocation("state", e.target.value)}
+              onChange={(e) =>
+                setLocation("state", e.target.value.toUpperCase())
+              }
               value={location.state}
-              isInvalid={!!errors.location?.state}
+              isInvalid={!!locationErrors?.state}
             />
             <Form.Control.Feedback type='invalid'>
-              {errors.location?.state}
+              {locationErrors?.state}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
 
         <hr className='my-5' />
-        <h2 className='mb-3'></h2>
+        <h2 className='mb-3'>Informações adicionais</h2>
+        <Row>
+          <Form.Group as={Col} md='12' className='mb-3'>
+            <Form.Label>Contato</Form.Label> <br />
+            <Form.Text>
+              Qual informação de contato devemos mostrar no seu anúncio?
+            </Form.Text>
+            <Form.Select
+              onChange={(e) => setContactInfo(e.target.value as ContactInfo)}
+              aria-label='contact'
+              value={contactInfo}
+            >
+              <option value={ContactInfo.EMAIL}>Apenas Email</option>
+              <option value={ContactInfo.PHONE}>Apenas Telefone</option>
+              <option value={ContactInfo.ALL}>Email e Telefone</option>
+            </Form.Select>
+          </Form.Group>
 
-        {!!errors.server && <Alert variant='danger'>{errors.server}</Alert>}
+          <Form.Group as={Col} md='6' className='mb-3'>
+            <Form.Label>Aceita</Form.Label>
+            <Form.Select
+              onChange={(e) => setGender(e.target.value as Gender)}
+              aria-label='Genêro'
+              value={gender}
+            >
+              <option value={Gender.ANY}>Todos</option>
+              <option value={Gender.MALE}>Apenas homens</option>
+              <option value={Gender.FEMALE}>Apenas mulheres</option>
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group as={Col} md='6' className='mb-3'>
+            <Form.Label>Preço (opcional)</Form.Label>
+            <Form.Control
+              required
+              type='number'
+              placeholder='Valor mensal'
+              onChange={(e) => {
+                //const str = e.target.value;
+                //const res = str.replace(/\D/g, "");
+                //Number(res).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'});
+                setPrice(Number(e.target.value));
+              }}
+              value={price}
+              isInvalid={!!errors.price}
+            />
+            <Form.Control.Feedback type='invalid'>
+              {errors.price}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group as={Col} md='12' className='mb-3'>
+            <Form.Label>Universidade/Campus</Form.Label>
+            <Form.Select
+              onChange={(e) => setInstitution(e.target.value)}
+              aria-label='Universidade/Campus'
+              value={institution}
+            >
+              <option value={""}>Nenhum</option>
+              {institutions.map((institution, i) => (
+                <option key={i} value={institution.id}>
+                  {institution.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Row>
+
+        {Object.keys(locationErrors).map((errKey, i) => (
+          <Alert variant='danger' key={i}>
+            <i className='bi bi-x-circle'></i>{" "}
+            {locationErrors[errKey as keyof IErrorsLocation]}
+          </Alert>
+        ))}
+
+        {Object.keys(errors).map((errKey, i) => (
+          <Alert variant='danger' key={i}>
+            <i className='bi bi-x-circle'></i> {errors[errKey as keyof IErrors]}
+          </Alert>
+        ))}
 
         <div className='d-flex flex-column align-items-center my-3'>
           <Button type='submit' variant='secondary' className='px-5 mb-3'>

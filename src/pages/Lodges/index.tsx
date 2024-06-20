@@ -5,6 +5,7 @@ import { Loader } from "../../components/Loader";
 import { LodgeCard } from "../../components/LodgeCard";
 import { useSearchParams } from "react-router-dom";
 import "./index.scss";
+import { SearchFilters } from "../../components/SearchFilters";
 
 export const Lodges = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,8 +20,7 @@ export const Lodges = () => {
   const [loading, setLoading] = useState(true);
 
   const handleSearch = async () => {
-    const page = Number(searchParams.get("page")) || 1;
-    const result = await searchLodges(page);
+    const result = await searchLodges(searchParams);
     setLodges(result.data.data);
     console.log(result.data);
 
@@ -37,6 +37,7 @@ export const Lodges = () => {
   return (
     <main>
       <h1 className='my-3'>Acomodações</h1>
+      <SearchFilters />
       <div className='lodges-grid mb-4'>
         {lodges.length ? (
           lodges.map((lodge, i) => <LodgeCard key={i} lodge={lodge} />)
