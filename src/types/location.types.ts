@@ -6,4 +6,6 @@ export type Location = {
   city: string;
   district: string;
   country: string;
+  latitude?: string;
+  longitude?: string;
 };

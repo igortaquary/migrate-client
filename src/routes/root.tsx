@@ -14,6 +14,7 @@ import { SignUp } from "../pages/SignUp";
 import { UserLodges } from "../pages/UserLodges";
 import { Lodges } from "../pages/Lodges";
 import { LodgeForm } from "../pages/LodgeForm";
+import { LodgePage } from "../pages/Lodge";
 
 export const RootRouter = () => {
   return (
@@ -24,6 +25,7 @@ export const RootRouter = () => {
           <Route path='/login' element={<Login />} />
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/lodges' element={<Lodges />} />
+          <Route path='/lodge/:id' element={<LodgePage />} />
           <Route element={<ProtectedRoute />}>
             {/* Rotas protegidas */}
             <Route path='/profile' element={<Profile />} />

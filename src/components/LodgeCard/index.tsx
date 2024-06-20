@@ -1,6 +1,7 @@
 import { Card } from "react-bootstrap";
 import "./index.scss";
 import { Lodge } from "../../types/lodge.types";
+import { Link } from "react-router-dom";
 
 interface ILodgeCard extends Lodge {
   title: string;
@@ -23,9 +24,11 @@ export const LodgeCard = ({ lodge }: { lodge: ILodgeCard }) => {
         <Card.Img></Card.Img>
       </Card.Header>
       <Card.Body>
-        <Card.Title>{lodge.title}</Card.Title>
-        <Card.Text className='description'>{lodge.description}</Card.Text>
-        {renderGender(lodge.gender)}
+        <Link to={"/lodge/" + lodge.id}>
+          <Card.Title>{lodge.title}</Card.Title>
+          <Card.Text className='description'>{lodge.description}</Card.Text>
+          {renderGender(lodge.gender)}
+        </Link>
       </Card.Body>
       <Card.Footer>{lodge.institution?.name}</Card.Footer>
     </Card>

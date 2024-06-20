@@ -44,8 +44,8 @@ export const LodgeForm = () => {
   const [institution, setInstitution] = useState(
     lodgeToEdit?.institution?.id || ""
   );
-  const [type, setType] = useState<LodgeType>(lodgeToEdit?.type || 0);
-  const [space, setSpace] = useState<SpaceType>(lodgeToEdit?.space || 0);
+  const [type, setType] = useState<LodgeType>(lodgeToEdit?.type || 1);
+  const [space, setSpace] = useState<SpaceType>(lodgeToEdit?.space || 1);
   const [gender, setGender] = useState<Gender>(lodgeToEdit?.gender || "any");
   const [contactInfo, setContactInfo] = useState<ContactInfo>(
     lodgeToEdit?.contactInfo || "all"

@@ -38,13 +38,18 @@ export const Lodges = () => {
     <main>
       <h1 className='my-3'>Acomodações</h1>
       <SearchFilters />
-      <div className='lodges-grid mb-4'>
-        {lodges.length ? (
-          lodges.map((lodge, i) => <LodgeCard key={i} lodge={lodge} />)
-        ) : (
-          <></>
-        )}
-      </div>
+      {}
+      {lodges.length ? (
+        <div className='lodges-grid mb-4'>
+          {lodges.map((lodge, i) => (
+            <LodgeCard key={i} lodge={lodge} />
+          ))}
+        </div>
+      ) : (
+        <div className='text-dark text-center my-5'>
+          Nenhuma acomodação encontrada com esses filtros
+        </div>
+      )}
       <Pagination
         currentPage={pageData.currentPage}
         lastPage={pageData.lastPage}

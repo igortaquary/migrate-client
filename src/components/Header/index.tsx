@@ -2,9 +2,20 @@ import { Link, NavLink } from "react-router-dom";
 import "./index.scss";
 import { useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
+import { Button, Dropdown } from "react-bootstrap";
 
 export const Header = () => {
   const userContext = useContext(UserContext);
+
+  const isMobile = window.screen.width < 768;
+
+  const loggedLinks = userContext.user
+    ? [
+        { to: "/profile", title: "Minha Conta" },
+        { to: "/profile", title: "Meus Anúncios" },
+      ]
+    : [{ to: "/login", title: "Entrar" }];
+  const links = [{ to: "/lodges", title: "Explorar" }, ...loggedLinks];
 
   return (
     <header className='header-wrapper'>
@@ -13,37 +24,39 @@ export const Header = () => {
           <Link to={"/"}>
             <h1>Migrate</h1>
           </Link>
-          <nav className='text-lowercase'>
-            <NavLink
-              to={"/lodges"}
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              Explorar
-            </NavLink>
-            {userContext.user ? (
-              <>
+          {isMobile ? (
+            <Dropdown align={"end"}>
+              <Dropdown.Toggle className='menu-button'>
+                <i className='bi bi-list'></i>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {links.map((link, i) => (
+                  <Dropdown.Item>
+                    <NavLink
+                      key={"navlink-" + i}
+                      to={link.to}
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      {link.title}
+                    </NavLink>
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
+          ) : (
+            <nav className='text-lowercase'>
+              {links.map((link, i) => (
                 <NavLink
-                  to={"/profile"}
+                  key={"navlink-" + i}
+                  to={link.to}
                   className={({ isActive }) => (isActive ? "active" : "")}
                 >
-                  Minha Conta
+                  {link.title}
                 </NavLink>
-                <NavLink
-                  to={"/my-lodges"}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Meus Anúncios
-                </NavLink>
-              </>
-            ) : (
-              <NavLink
-                to={"/login"}
-                className={({ isActive }) => (isActive ? "active" : "")}
-              >
-                Entrar
-              </NavLink>
-            )}
-          </nav>
+              ))}
+            </nav>
+          )}
         </div>
       </div>
     </header>

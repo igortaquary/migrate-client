@@ -17,6 +17,7 @@ interface IUserContext {
   logout: () => void;
   user: User | undefined;
   loading: boolean;
+  displayLogInModal: () => void;
 }
 
 const ACCESS_TOKEN = "access_token";
@@ -27,6 +28,7 @@ const defaultValues: IUserContext = {
   logout: () => {},
   user: undefined,
   loading: true,
+  displayLogInModal: () => {},
 };
 
 export const UserContext = createContext(defaultValues);
@@ -34,6 +36,7 @@ export const UserContext = createContext(defaultValues);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | undefined>(defaultValues.user);
   const [loading, setLoading] = useState(defaultValues.loading);
+  const [showModal, setShowModal] = useState(false);
 
   const login = async (payload: authService.ISignIn, onError?: Function) => {
     try {
@@ -109,10 +112,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return JSON.parse(jsonPayload);
   };
 
+  const displayLogInModal = () => {
+    setShowModal(true);
+  };
+
   useEffect(verifyLoggedIn, []);
 
   return (
-    <UserContext.Provider value={{ user, loading, login, logout, signUp }}>
+    <UserContext.Provider
+      value={{ user, loading, login, logout, signUp, displayLogInModal }}
+    >
       {children}
     </UserContext.Provider>
   );

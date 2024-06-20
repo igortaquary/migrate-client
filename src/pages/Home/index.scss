@@ -1,0 +1,12 @@
+@use '../../index.scss' as *;
+
+.hero-text {
+  font-family: 'CherryBombOne';
+  text-align: center;
+  margin: 5rem 0;
+  
+  span {
+    text-decoration: underline;
+    text-decoration-color: $primary;
+  }
+}
