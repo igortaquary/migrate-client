@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import * as authService from "../services/auth.service";
+import { Button, Modal } from "react-bootstrap";
 
 type User = {
   id: string;
@@ -123,6 +124,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       value={{ user, loading, login, logout, signUp, displayLogInModal }}
     >
       {children}
+      <Modal
+        show={showModal}
+        size='sm'
+        onHide={() => setShowModal(false)}
+        className='text-center'
+        centered
+      >
+        <Modal.Body>
+          <div className='mb-3'>
+            <b>Você precisa estar logado para realizar essa ação.</b>
+          </div>
+          <a href='/login' className='btn btn-primary'>
+            entrar
+          </a>
+        </Modal.Body>
+      </Modal>
     </UserContext.Provider>
   );
 };

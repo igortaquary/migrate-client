@@ -3,10 +3,21 @@
 .hero-text {
   font-family: 'CherryBombOne';
   text-align: center;
-  margin: 5rem 0;
+  padding: 5rem 0;
+  background-color: $secondary;
+  color: $white;
   
   span {
     text-decoration: underline;
     text-decoration-color: $primary;
+  }
+}
+
+.home-second-section {
+  background-color: $white;
+  padding: 3rem 0;
+
+  i {
+    font-size: 2rem;
   }
 }

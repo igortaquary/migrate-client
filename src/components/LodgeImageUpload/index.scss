@@ -1,0 +1,53 @@
+@use '../../index.scss' as *;
+
+.images-upload-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 2rem 0;
+
+  .image-item {
+    cursor: pointer;
+    width: 200px;
+    height: 200px;
+    border-radius: 20px;
+    border: $gray-500 1px solid;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 20px;
+    }
+
+    .remove-button {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      right: -10px;
+      top: -10px;
+      font-size: 1.5rem;
+      line-height: 0;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background-color: $gray-300;
+    }
+  }
+
+  .add-image-button {
+    color: $dark;
+    background-color: $gray-300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 2rem;
+    }
+  }
+}

@@ -1,18 +1,30 @@
 import { Link, NavLink } from "react-router-dom";
 import "./index.scss";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { Button, Dropdown } from "react-bootstrap";
 
 export const Header = () => {
   const userContext = useContext(UserContext);
 
-  const isMobile = window.screen.width < 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const loggedLinks = userContext.user
     ? [
         { to: "/profile", title: "Minha Conta" },
-        { to: "/profile", title: "Meus Anúncios" },
+        { to: "/my-lodges", title: "Meus Anúncios" },
       ]
     : [{ to: "/login", title: "Entrar" }];
   const links = [{ to: "/lodges", title: "Explorar" }, ...loggedLinks];
@@ -32,9 +44,8 @@ export const Header = () => {
 
               <Dropdown.Menu>
                 {links.map((link, i) => (
-                  <Dropdown.Item>
+                  <Dropdown.Item key={"item-" + i}>
                     <NavLink
-                      key={"navlink-" + i}
                       to={link.to}
                       className={({ isActive }) => (isActive ? "active" : "")}
                     >

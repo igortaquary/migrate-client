@@ -1,5 +1,6 @@
 import { Location } from "../types/location.types";
 import { Lodge } from "../types/lodge.types";
+import { PhotoToUpload } from "../types/photo.type";
 import api from "./api";
 
 export const getLodge = (id: string) => {
@@ -11,7 +12,8 @@ export const getUserLodges = () => {
 };
 
 export interface CreateLodgeDto
-  extends Omit<Lodge, "id" | "distanceFromInstitution"> {
+  extends Omit<Lodge, "id" | "distanceFromInstitution" | "photos"> {
+  photos: PhotoToUpload[];
   institutionId: string | null;
 }
 
@@ -29,4 +31,8 @@ export const deleteLodge = (id: string) => {
 
 export const searchLodges = (params: any) => {
   return api.get("/lodge", { params });
+};
+
+export const getLodgeContactInfo = (id: string) => {
+  return api.get("/lodge/" + id + "/contact");
 };

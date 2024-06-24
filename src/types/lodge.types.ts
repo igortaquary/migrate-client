@@ -1,5 +1,7 @@
 import { Institution } from "./institution.types";
 import { Location } from "./location.types";
+import { Photo } from "./photo.type";
+import { User } from "./user.types";
 
 export enum LodgeType {
   ENTIRE = 1,
@@ -25,6 +27,13 @@ export enum ContactInfo {
   ALL = "all",
 }
 
+export enum DirectionMode {
+  DRIVING = "driving",
+  WALKING = "walking",
+  BICYCLING = "bicycling",
+  TRANSIT = "transit",
+}
+
 export type Lodge = {
   id: string;
   title: string;
@@ -35,6 +44,9 @@ export type Lodge = {
   contactInfo: ContactInfo;
   price?: number;
   distanceFromInstitution?: number;
+  directionMode?: DirectionMode;
   location?: Location;
   institution?: Institution;
+  user?: User;
+  photos: Photo[];
 };

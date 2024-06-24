@@ -7,9 +7,9 @@ import Row from "react-bootstrap/esm/Row";
 import { Link, Navigate, useLocation } from "react-router-dom";
 
 import { createLodge, updateLodge } from "../../services/lodge.service";
-import { getAddessByCep } from "../../services/viacep";
 import {
   ContactInfo,
+  DirectionMode,
   Gender,
   Lodge,
   LodgeType,
@@ -17,23 +17,25 @@ import {
 } from "../../types/lodge.types";
 import { Location } from "../../types/location.types";
 import { getAllInstitutions } from "../../services/institution.service";
+import { LodgeImageUpload } from "../../components/LodgeImageUpload";
+import { LodgeLocationForm } from "../../components/LodgeLocationForm";
+import { Photo, PhotoToUpload } from "../../types/photo.type";
 
 interface IErrors {
   title?: string;
   description?: string;
   server?: string;
   price?: string;
+  location?: string;
 }
-
-interface IErrorsLocation extends Partial<Location> {}
 
 export const LodgeForm = () => {
   const { state } = useLocation();
-  const lodgeToEdit = state?.lodge as Lodge;
+  const lodgeToEdit = state?.lodge as Lodge | undefined;
 
+  const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<IErrors>({});
-  const [locationErrors, setLocationErrors] = useState<IErrorsLocation>({});
 
   const [institutions, setInstitutions] = useState<any[]>([]);
 
@@ -46,98 +48,88 @@ export const LodgeForm = () => {
   );
   const [type, setType] = useState<LodgeType>(lodgeToEdit?.type || 1);
   const [space, setSpace] = useState<SpaceType>(lodgeToEdit?.space || 1);
-  const [gender, setGender] = useState<Gender>(lodgeToEdit?.gender || "any");
+  const [gender, setGender] = useState<Gender>(
+    lodgeToEdit?.gender || Gender.ANY
+  );
   const [contactInfo, setContactInfo] = useState<ContactInfo>(
-    lodgeToEdit?.contactInfo || "all"
+    lodgeToEdit?.contactInfo || ContactInfo.ALL
   );
   const [price, setPrice] = useState<number | undefined>(
     lodgeToEdit?.price || undefined
+  );
+  const [directionMode, setDirectionMode] = useState(
+    lodgeToEdit?.directionMode || ""
   );
 
   const [location, setLocationObj] = useState<Partial<Location>>(
     lodgeToEdit?.location || {}
   );
-  const [zipCode, setZipCode] = useState(lodgeToEdit?.location?.zipCode || "");
-  const [lastZipCode, setLastZipCode] = useState("-");
+  const [isValidLocation, setIsValidLocation] = useState<boolean>(false);
 
-  const setLocation = (attribute: keyof Location, value: string) => {
-    setLocationObj({ ...location, [attribute]: value });
-  };
+  const [photos, setPhotos] = useState<PhotoToUpload[]>(
+    lodgeToEdit?.photos || []
+  );
+  const [isValidPhotos, setIsValidPhotos] = useState<boolean>(false);
 
   const handleGetInstitutions = async () => {
     const result = await getAllInstitutions();
     setInstitutions(result.data);
   };
 
-  const handleZipCode = async () => {
-    let err = locationErrors;
-
-    if (/^\d{8}$/.test(zipCode)) {
-      console.log("zipCode");
-      err.zipCode = "";
-      if (lastZipCode !== zipCode) {
-        setLastZipCode(zipCode);
-        const result = await getAddessByCep(zipCode);
-        if (result) setLocationObj(result);
-      }
-    } else {
-      err.zipCode = "CEP inválido. Apenas números";
-    }
-    setLocationErrors(err);
-  };
-
   const validate = () => {
     const err: IErrors = {};
-    const locErr: IErrorsLocation = {};
     if (title.length < 5)
       err.title = "O título do seu anúncio está muito curto";
     if (description.length < 20)
       err.description = "A descrição do seu anúncio está muito curta";
     if (!location) err.server = "Preencha a localização da acomodação";
 
-    if (location) {
-      if (!location.address)
-        locErr.address = "Preencha o endereço da acomodação";
-      if (!location.district)
-        locErr.district = "Preencha o bairro da acomodação";
-      if (!location.city) locErr.city = "Preencha a cidade da acomodação";
-      if (!location.state) locErr.state = "Preencha a UF da acomodação";
-    }
-
     setErrors(err);
-    setLocationErrors(locErr);
-    return Object.keys({ ...err, ...locErr }).length === 0;
+    return Object.keys(err).length === 0;
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (validate()) {
+      setSubmitting(true);
+    }
+  };
+
+  const send = async () => {
+    if (!validate()) return setSubmitting(false);
     try {
-      if (validate()) {
-        const payload = {
-          title,
-          description,
-          space,
-          type,
-          gender,
-          contactInfo,
-          price,
-          location: { ...location } as Location,
-          institutionId: institution || null,
-        };
-        if (lodgeToEdit) {
-          await updateLodge(lodgeToEdit.id, payload);
-        } else {
-          await createLodge(payload);
-        }
-        setSuccess(true);
+      const payload = {
+        title,
+        description,
+        space,
+        type,
+        gender,
+        contactInfo,
+        price,
+        location: { ...location } as Location,
+        photos,
+        institutionId: institution || null,
+      };
+      if (lodgeToEdit) {
+        await updateLodge(lodgeToEdit.id, payload);
+      } else {
+        await createLodge(payload);
       }
+      setSuccess(true);
     } catch (error: any) {
       setErrors({
         server: "Não foi possível salvar. Verifique os dados e tente novamente",
       });
+      setSubmitting(false);
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (submitting) {
+      if (isValidLocation && isValidPhotos) send();
+    } else setSubmitting(false);
+  }, [isValidLocation, isValidPhotos, submitting]);
 
   useEffect(() => {
     handleGetInstitutions();
@@ -213,87 +205,12 @@ export const LodgeForm = () => {
         </Row>
         <hr className='my-5' />
         <h2 className='mb-3'>Localização</h2>
-
-        <Row>
-          <Form.Group as={Col} md='12' className='mb-3'>
-            <Form.Label>CEP</Form.Label>
-            <Form.Control
-              required
-              type='text'
-              placeholder='Digite o CEP (apenas números)'
-              onChange={(e) => setZipCode(e.target.value)}
-              value={zipCode}
-              isInvalid={!!locationErrors?.zipCode}
-              onBlur={handleZipCode}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {locationErrors?.zipCode}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group as={Col} md='6' className='mb-3'>
-            <Form.Label>Endereço</Form.Label>
-            <Form.Control
-              required
-              type='text'
-              placeholder='Rua, avenida, etc.'
-              onChange={(e) => setLocation("address", e.target.value)}
-              value={location.address}
-              isInvalid={!!locationErrors?.address}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {locationErrors?.address}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group as={Col} md='6' className='mb-3'>
-            <Form.Label>Bairro</Form.Label>
-            <Form.Control
-              required
-              type='text'
-              placeholder='Seu bairro'
-              onChange={(e) => setLocation("district", e.target.value)}
-              value={location.district}
-              isInvalid={!!locationErrors?.district}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {locationErrors?.district}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group as={Col} md='6' className='mb-3'>
-            <Form.Label>Cidade</Form.Label>
-            <Form.Control
-              required
-              type='text'
-              placeholder='Brasília'
-              onChange={(e) => setLocation("city", e.target.value)}
-              value={location.city}
-              isInvalid={!!locationErrors?.city}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {locationErrors?.city}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group as={Col} md='6' className='mb-3'>
-            <Form.Label>Estado</Form.Label>
-            <Form.Control
-              required
-              type='text'
-              maxLength={2}
-              placeholder='UF'
-              onChange={(e) =>
-                setLocation("state", e.target.value.toUpperCase())
-              }
-              value={location.state}
-              isInvalid={!!locationErrors?.state}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {locationErrors?.state}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
+        <LodgeLocationForm
+          submitting={submitting}
+          location={location}
+          setLocationObj={setLocationObj}
+          setIsValidLocation={setIsValidLocation}
+        />
 
         <hr className='my-5' />
         <h2 className='mb-3'>Informações adicionais</h2>
@@ -334,9 +251,6 @@ export const LodgeForm = () => {
               type='number'
               placeholder='Valor mensal'
               onChange={(e) => {
-                //const str = e.target.value;
-                //const res = str.replace(/\D/g, "");
-                //Number(res).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'});
                 setPrice(Number(e.target.value));
               }}
               value={price}
@@ -362,14 +276,39 @@ export const LodgeForm = () => {
               ))}
             </Form.Select>
           </Form.Group>
+
+          {institution && (
+            <Form.Group as={Col} md='12' className='mb-3'>
+              <Form.Label>Forma de transporte mais comum</Form.Label>
+              <Form.Text>
+                Como geralmente você ou quem mora próximo vai desta acomodação
+                para a instituição selecionada?
+              </Form.Text>
+              <Form.Select
+                onChange={(e) => setDirectionMode(e.target.value)}
+                aria-label='Forma de transporte'
+                value={directionMode}
+              >
+                <option value={DirectionMode.TRANSIT}>
+                  Transporte público
+                </option>
+                <option value={DirectionMode.DRIVING}>Dirigindo</option>
+                <option value={DirectionMode.WALKING}>Andando</option>
+                <option value={DirectionMode.BICYCLING}>Bicicleta</option>
+              </Form.Select>
+            </Form.Group>
+          )}
         </Row>
 
-        {Object.keys(locationErrors).map((errKey, i) => (
-          <Alert variant='danger' key={i}>
-            <i className='bi bi-x-circle'></i>{" "}
-            {locationErrors[errKey as keyof IErrorsLocation]}
-          </Alert>
-        ))}
+        <hr className='my-5' />
+        <h2 className='mb-3'>Fotos</h2>
+        <p>Adicione algumas fotos da acomodação</p>
+        <LodgeImageUpload
+          submitting={submitting}
+          photos={photos}
+          setIsValid={setIsValidPhotos}
+          setPhotos={setPhotos}
+        />
 
         {Object.keys(errors).map((errKey, i) => (
           <Alert variant='danger' key={i}>

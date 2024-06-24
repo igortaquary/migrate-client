@@ -67,15 +67,35 @@ export const UserLodgeCard = ({
         </div>
         <div className='col-md-2'>
           <div className='gap-2 d-flex justify-content-end'>
-            <Button size='sm' variant='danger' onClick={handleDelete}>
+            <Button
+              className='text-white'
+              size='sm'
+              variant='danger'
+              onClick={handleDelete}
+              data-toggle='tooltip'
+              data-placement='bottom'
+              title='Apagar anúncio'
+            >
               <i className='bi bi-trash'></i>
             </Button>
             <Link
               to={"edit"}
               state={{ lodge }}
-              className='btn btn-sm btn-primary'
+              className='btn btn-sm btn-primary text-white'
+              data-toggle='tooltip'
+              data-placement='bottom'
+              title='Editar anúncio'
             >
               <i className='bi bi-pencil-square'></i>
+            </Link>
+            <Link
+              to={"/lodge/" + lodge.id}
+              className='btn btn-sm btn-secondary text-white'
+              data-toggle='tooltip'
+              data-placement='bottom'
+              title='Ver anúncio'
+            >
+              <i className='bi bi-eye-fill'></i>
             </Link>
           </div>
         </div>
