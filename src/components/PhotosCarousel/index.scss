@@ -1,0 +1,18 @@
+.photo-carousel {
+  .photo-carousel-item {
+
+    img {
+      width: 100%;
+      box-sizing: content-box;
+    }
+  }
+
+  .arrow-button {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+}

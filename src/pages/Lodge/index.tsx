@@ -2,11 +2,12 @@ import { ReactElement, useContext, useEffect, useState } from "react";
 import { Gender, Lodge, LodgeType, SpaceType } from "../../types/lodge.types";
 import { Loader } from "../../components/Loader";
 import showNotification from "../../components/GlobalAlert";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getLodge, getLodgeContactInfo } from "../../services/lodge.service";
-import { Alert, Button, Card, Col, Row } from "react-bootstrap";
+import { Alert, Breadcrumb, Button, Card, Col, Row } from "react-bootstrap";
 import { Map } from "../../components/Map";
 import { UserContext } from "../../contexts/UserContext";
+import { PhotosCarousel } from "../../components/PhotosCarousel";
 
 interface ILoading {
   lodge: boolean;
@@ -132,11 +133,22 @@ export const LodgePage = () => {
   if (!lodge) return <Alert>Ocorreu um erro ao buscar esta acomodação!</Alert>;
 
   return (
-    <main className='py-3'>
+    <main className='my-3'>
+      <div className='my-3'>
+        <Link to={"/"}>
+          <i className='bi bi-house-fill'></i>
+        </Link>
+        {" > "}
+        <Link to={"/lodges"}>Acomodações</Link>
+        {" > "}
+        <label>{lodge.title}</label>
+      </div>
       <h1>{lodge.title}</h1>
-      <Row>
+      <Row className='gx-4 gy-3 mb-3'>
         <Col md={7} className='mb-3'>
-          <Card className='p-3 h-100'></Card>
+          <Card className='p-3 h-100'>
+            <PhotosCarousel photos={lodge.photos} />
+          </Card>
         </Col>
         <Col md={5} className='mb-3'>
           <Card className='p-3 h-100 gap-3'>

@@ -1,7 +1,8 @@
 import { Card } from "react-bootstrap";
 import "./index.scss";
 import { Lodge } from "../../types/lodge.types";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import imagePlaceholder from "../../assets/images/house-placeholder.jpg";
 
 interface ILodgeCard extends Lodge {
   title: string;
@@ -18,17 +19,20 @@ const renderGender = (gender: string) => {
 };
 
 export const LodgeCard = ({ lodge }: { lodge: ILodgeCard }) => {
+  const navigate = useNavigate();
+
+  const imgUrl =
+    lodge.photos && lodge.photos[0]?.url
+      ? lodge.photos[0].url
+      : imagePlaceholder;
+
   return (
-    <Card className='lodge-card'>
-      <Card.Header>
-        <Card.Img></Card.Img>
-      </Card.Header>
+    <Card className='lodge-card' onClick={() => navigate("/lodge/" + lodge.id)}>
       <Card.Body>
-        <Link to={"/lodge/" + lodge.id}>
-          <Card.Title>{lodge.title}</Card.Title>
-          <Card.Text className='description'>{lodge.description}</Card.Text>
-          {renderGender(lodge.gender)}
-        </Link>
+        <Card.Img src={imgUrl}></Card.Img>
+        <Card.Title>{lodge.title}</Card.Title>
+        <Card.Text className='description'>{lodge.description}</Card.Text>
+        {renderGender(lodge.gender)}
       </Card.Body>
       <Card.Footer>{lodge.institution?.name}</Card.Footer>
     </Card>

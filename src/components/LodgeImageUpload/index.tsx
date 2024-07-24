@@ -38,11 +38,20 @@ export const LodgeImageUpload = ({
   photos,
   setPhotos,
 }: ILodgeImageUpload) => {
-  const [images, setImages] = useState<ImageListType>([]);
+  //const [images, setImages] = useState<ImageListType>([]);
   const [errors, setErrors] = useState<IErrors>({});
 
   const onChange = (list: ImageListType) => {
-    setImages(list.map((item, i) => ({ ...item, id: "", order: i })));
+    // setImages(list.map((item, i) => ({ ...item, id: "", order: i })));
+    console.log(list);
+    setPhotos(
+      list.map((item, i) => ({
+        ...item,
+        //url: item.dataURL,
+        id: item.id,
+        order: i,
+      }))
+    );
   };
 
   const handleComponentError = (errs?: ErrorsType) => {
@@ -52,7 +61,7 @@ export const LodgeImageUpload = ({
         .filter((entry) => entry[1])
         .map((entry) => entry[0]);
     }
-    if (images.length < 1) {
+    if (photos.length < 1) {
       trueErrs = [...trueErrs, "minNumber"];
     }
     const messages: IErrors = {};
@@ -63,80 +72,79 @@ export const LodgeImageUpload = ({
   };
 
   const validate = () => {
-    if (images.length < 1) {
-      setErrors({
-        ...errors,
-        minNumber: errorMessages.minNumber,
-      });
-      return;
+    const errs: IErrors = {};
+    if (photos.length < 1) {
+      errs.minNumber = errorMessages.minNumber;
     }
-    setIsValid(Object.keys(errors).length === 0);
+    setErrors(errs);
+    setIsValid(Object.keys(errs).length === 0);
   };
 
   useEffect(() => {
     if (submitting) validate();
   }, [submitting]);
 
-  const renderError = (message: string) => {
-    return <Alert>{message}</Alert>;
-  };
-
   return (
-    <ReactImageUploading
-      multiple
-      value={images}
-      onChange={onChange}
-      maxNumber={maxNumber}
-      dataURLKey='url'
-      maxFileSize={50 * 1000} // 50 kB
-      acceptType={["jpg", "png"]}
-      allowNonImageType={false}
-      onError={handleComponentError}
-    >
-      {({
-        imageList,
-        onImageUpload,
-        onImageUpdate,
-        onImageRemove,
-        isDragging,
-        dragProps,
-      }) => (
-        <div>
-          <div className='images-upload-wrapper'>
-            {imageList.map((image, index) => (
-              <div key={index} className='image-item'>
-                <img
-                  onClick={() => onImageUpdate(index)}
-                  src={image["url"]}
-                  alt=''
-                  width='100%'
-                />
+    <div>
+      <ReactImageUploading
+        multiple
+        value={photos}
+        onChange={onChange}
+        maxNumber={maxNumber}
+        dataURLKey='url'
+        maxFileSize={50 * 1000} // 50 kB
+        acceptType={["jpg", "png"]}
+        allowNonImageType={false}
+        onError={handleComponentError}
+      >
+        {({
+          imageList,
+          onImageUpload,
+          onImageUpdate,
+          onImageRemove,
+          isDragging,
+          dragProps,
+        }) => (
+          <div>
+            <div className='images-upload-wrapper'>
+              {imageList.map((image, index) => (
+                <div key={index} className='image-item'>
+                  <img
+                    onClick={() => onImageUpdate(index)}
+                    src={image["url"]}
+                    alt=''
+                    width='100%'
+                  />
+                  <button
+                    type='button'
+                    className='remove-button'
+                    onClick={() => onImageRemove(index)}
+                  >
+                    <i className='bi bi-x-circle'></i>
+                  </button>
+                </div>
+              ))}
+              {photos.length < maxNumber && (
                 <button
                   type='button'
-                  className='remove-button'
-                  onClick={() => onImageRemove(index)}
+                  className='image-item add-image-button'
+                  style={isDragging ? { color: "red" } : undefined}
+                  onClick={onImageUpload}
+                  {...dragProps}
                 >
-                  <i className='bi bi-x-circle'></i>
+                  <i className='bi bi-plus-circle'></i>
+                  Clique ou arraste a imagem aqui
                 </button>
-              </div>
-            ))}
-            {images.length < maxNumber && (
-              <button
-                type='button'
-                className='image-item add-image-button'
-                style={isDragging ? { color: "red" } : undefined}
-                onClick={onImageUpload}
-                {...dragProps}
-              >
-                <i className='bi bi-plus-circle'></i>
-                Clique ou arraste a imagem aqui
-              </button>
-            )}
+              )}
+            </div>
           </div>
-          {errors?.acceptType && renderError("")}
-          {errors?.maxFileSize && renderError("")}
-        </div>
-      )}
-    </ReactImageUploading>
+        )}
+      </ReactImageUploading>
+      {Object.keys(errors).map((errKey, i) => (
+        <Alert variant='danger' key={i}>
+          <i className='bi bi-x-circle'></i> {errors[errKey as keyof IErrors]}
+        </Alert>
+      ))}
+    </div>
   );
 };

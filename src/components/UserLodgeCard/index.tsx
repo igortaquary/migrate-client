@@ -5,6 +5,8 @@ import { deleteLodge } from "../../services/lodge.service";
 import { useState } from "react";
 import showNotification from "../GlobalAlert";
 import { Lodge } from "../../types/lodge.types";
+import { Carousel } from "@trendyol-js/react-carousel";
+import { PhotosCarousel } from "../PhotosCarousel";
 
 export interface IUserLodge extends Lodge {}
 
@@ -15,8 +17,14 @@ export const UserLodgeCard = ({
   lodge: IUserLodge;
   onDelete: () => void;
 }) => {
-  const { title, description, location, institution, distanceFromInstitution } =
-    lodge;
+  const {
+    title,
+    description,
+    location,
+    institution,
+    distanceFromInstitution,
+    photos,
+  } = lodge;
 
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +57,9 @@ export const UserLodgeCard = ({
   return (
     <Card className='user-lodge-card'>
       <div className='row'>
-        <div className='col-md-3'>Imagem</div>
+        <div className='col-md-3'>
+          <PhotosCarousel photos={photos} />
+        </div>
         <div className='col-md-4'>
           <b>{title}</b>
           <p className='description'>{description}</p>

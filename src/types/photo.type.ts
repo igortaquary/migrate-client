@@ -4,12 +4,8 @@ export type Photo = {
   order: number;
 };
 
-export type PhotoToUpload =
-  | {
-      id: string;
-      order: number;
-    }
-  | {
-      base64: string;
-      order: number;
-    };
+export type PhotoToUpload = {
+  id?: string;
+  url?: string;
+  order: number;
+};

@@ -57,8 +57,8 @@ export const LodgeForm = () => {
   const [price, setPrice] = useState<number | undefined>(
     lodgeToEdit?.price || undefined
   );
-  const [directionMode, setDirectionMode] = useState(
-    lodgeToEdit?.directionMode || ""
+  const [directionMode, setDirectionMode] = useState<DirectionMode>(
+    lodgeToEdit?.directionMode || DirectionMode.TRANSIT
   );
 
   const [location, setLocationObj] = useState<Partial<Location>>(
@@ -90,6 +90,11 @@ export const LodgeForm = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log({
+      isValidLocation,
+      isValidPhotos,
+      submitting,
+    });
     if (validate()) {
       setSubmitting(true);
     }
@@ -108,6 +113,7 @@ export const LodgeForm = () => {
         price,
         location: { ...location } as Location,
         photos,
+        directionMode,
         institutionId: institution || null,
       };
       if (lodgeToEdit) {
@@ -127,7 +133,11 @@ export const LodgeForm = () => {
 
   useEffect(() => {
     if (submitting) {
-      if (isValidLocation && isValidPhotos) send();
+      if (isValidLocation && isValidPhotos) {
+        send();
+      } else {
+        setSubmitting(false);
+      }
     } else setSubmitting(false);
   }, [isValidLocation, isValidPhotos, submitting]);
 
@@ -285,7 +295,9 @@ export const LodgeForm = () => {
                 para a instituição selecionada?
               </Form.Text>
               <Form.Select
-                onChange={(e) => setDirectionMode(e.target.value)}
+                onChange={(e) =>
+                  setDirectionMode(e.target.value as DirectionMode)
+                }
                 aria-label='Forma de transporte'
                 value={directionMode}
               >
