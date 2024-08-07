@@ -4,7 +4,7 @@ import ReactImageUploading, {
   ErrorsType,
 } from "react-images-uploading";
 import "./index.scss";
-import { Photo, PhotoToUpload } from "../../types/photo.type";
+import { PhotoToUpload } from "../../types/photo.type";
 import { Alert } from "react-bootstrap";
 
 interface ILodgeImageUpload {
@@ -25,7 +25,7 @@ interface IErrors {
 const maxNumber = 3;
 
 const errorMessages: IErrors = {
-  maxFileSize: "O tamanho da imagem é maior que 50 kB",
+  maxFileSize: "O tamanho da imagem é maior que 1 MB",
   acceptType: "O tipo de arquivo não é permitido",
   maxNumber: "O número maximo de imagens é " + maxNumber,
   minNumber: "Adicione pelo menos uma foto ao anúncio",
@@ -52,7 +52,26 @@ export const LodgeImageUpload = ({
         order: i,
       }))
     );
+    setErrors({});
   };
+
+  /* const handleFileCompress = async (imageFile: File) => {
+    console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
+
+    const options = {
+      maxSizeMB: 1,
+      //maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+    try {
+      const compressedFile = await imageCompression(imageFile, options);
+      console.log(
+        `compressedFile size ${compressedFile.size / 1024 / 1024} MB`
+      ); // smaller than maxSizeMB
+    } catch (error) {
+      console.log(error);
+    }
+  }; */
 
   const handleComponentError = (errs?: ErrorsType) => {
     let trueErrs: string[] = [];
@@ -92,7 +111,7 @@ export const LodgeImageUpload = ({
         onChange={onChange}
         maxNumber={maxNumber}
         dataURLKey='url'
-        maxFileSize={50 * 1000} // 50 kB
+        maxFileSize={1000 * 1000} // 1 MB
         acceptType={["jpg", "png"]}
         allowNonImageType={false}
         onError={handleComponentError}
@@ -140,9 +159,9 @@ export const LodgeImageUpload = ({
           </div>
         )}
       </ReactImageUploading>
-      {Object.keys(errors).map((errKey, i) => (
+      {Object.values(errors).map((error, i) => (
         <Alert variant='danger' key={i}>
-          <i className='bi bi-x-circle'></i> {errors[errKey as keyof IErrors]}
+          <i className='bi bi-x-circle'></i> {error}
         </Alert>
       ))}
     </div>

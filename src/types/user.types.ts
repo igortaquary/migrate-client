@@ -1,8 +1,9 @@
 export type User = {
+  id?: string;
   name: string;
   email: string;
   phone?: string;
-  gender: string;
+  gender?: string;
 };
 
 const genders = {

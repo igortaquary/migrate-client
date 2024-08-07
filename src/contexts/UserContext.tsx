@@ -1,12 +1,8 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import * as authService from "../services/auth.service";
-import { Button, Modal } from "react-bootstrap";
-
-type User = {
-  id: string;
-  email: string;
-  name: string;
-};
+import { Modal } from "react-bootstrap";
+import { User } from "../types/user.types";
+import { updateProfile } from "../services/user.service";
 
 interface IUserContext {
   login: (payload: authService.ISignIn, onError?: Function) => Promise<void>;
@@ -121,7 +117,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, loading, login, logout, signUp, displayLogInModal }}
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        signUp,
+        displayLogInModal,
+      }}
     >
       {children}
       <Modal

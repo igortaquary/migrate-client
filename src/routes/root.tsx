@@ -15,6 +15,7 @@ import { UserLodges } from "../pages/UserLodges";
 import { Lodges } from "../pages/Lodges";
 import { LodgeForm } from "../pages/LodgeForm";
 import { LodgePage } from "../pages/Lodge";
+import { EditProfile } from "../pages/EditProfile";
 
 export const RootRouter = () => {
   return (
@@ -29,6 +30,7 @@ export const RootRouter = () => {
           <Route element={<ProtectedRoute />}>
             {/* Rotas protegidas */}
             <Route path='/profile' element={<Profile />} />
+            <Route path='/profile/edit' element={<EditProfile />} />
             <Route path='/my-lodges' element={<UserLodges />} />
             <Route path='/my-lodges/create' element={<LodgeForm />} />
             <Route path='/my-lodges/edit' element={<LodgeForm />} />

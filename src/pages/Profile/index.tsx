@@ -4,6 +4,7 @@ import { Loader } from "../../components/Loader";
 import { getProfile } from "../../services/user.service";
 import { genderMap, User } from "../../types/user.types";
 import { Alert } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export const Profile = () => {
   const userContext = useContext(UserContext);
@@ -46,14 +47,14 @@ export const Profile = () => {
       </div>
       <div>
         <b>Gênero: </b>
-        {genderMap[user?.gender]}
+        {genderMap[user?.gender!]}
       </div>
       <hr />
       <div className='row row-gap-3'>
         <div className='col-md-6'>
-          <button type='button' className='btn btn-secondary w-100'>
+          <Link to='edit' className='btn btn-secondary w-100'>
             Editar Perfil
-          </button>
+          </Link>
         </div>
         <div className='col-md-6'>
           <button
