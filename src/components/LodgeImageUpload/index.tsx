@@ -1,18 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ReactImageUploading, {
   ImageListType,
   ErrorsType,
 } from "react-images-uploading";
 import "./index.scss";
 import { PhotoToUpload } from "../../types/photo.type";
-import { Alert } from "react-bootstrap";
-
-interface ILodgeImageUpload {
-  submitting: boolean;
-  photos: PhotoToUpload[];
-  setPhotos: (value: PhotoToUpload[]) => void;
-  setIsValid: (value: boolean) => void;
-}
+import { Alert, Button } from "react-bootstrap";
+import { LodgeFormContext } from "../../contexts/LodgeFormContext";
 
 interface IErrors {
   maxFileSize?: string;
@@ -25,53 +19,55 @@ interface IErrors {
 const maxNumber = 3;
 
 const errorMessages: IErrors = {
-  maxFileSize: "O tamanho da imagem é maior que 1 MB",
+  maxFileSize: "O tamanho da imagem é maior que 200 kB",
   acceptType: "O tipo de arquivo não é permitido",
   maxNumber: "O número maximo de imagens é " + maxNumber,
   minNumber: "Adicione pelo menos uma foto ao anúncio",
   resolution: "Resolução inadequada",
 };
 
-export const LodgeImageUpload = ({
-  submitting,
-  setIsValid,
-  photos,
-  setPhotos,
-}: ILodgeImageUpload) => {
-  //const [images, setImages] = useState<ImageListType>([]);
+export const LodgeImageUpload = () => {
+  const { setPhotosToUpload, prevStep, lodgeToEdit, changeStepValidity } =
+    useContext(LodgeFormContext);
+
+  const [photos, setPhotos] = useState<PhotoToUpload[]>(
+    lodgeToEdit?.photos.map((p) => ({ ...p, action: "edit" })) || []
+  );
   const [errors, setErrors] = useState<IErrors>({});
 
   const onChange = (list: ImageListType) => {
-    // setImages(list.map((item, i) => ({ ...item, id: "", order: i })));
-    console.log(list);
     setPhotos(
       list.map((item, i) => ({
-        ...item,
-        //url: item.dataURL,
         id: item.id,
+        url: item.url,
         order: i,
+        action: item.id ? "edit" : "create",
       }))
     );
     setErrors({});
   };
 
-  /* const handleFileCompress = async (imageFile: File) => {
-    console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
+  const getDiff = () => {
+    if (lodgeToEdit?.photos) {
+      const oldPhotos = lodgeToEdit.photos;
 
-    const options = {
-      maxSizeMB: 1,
-      //maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    };
-    try {
-      const compressedFile = await imageCompression(imageFile, options);
-      console.log(
-        `compressedFile size ${compressedFile.size / 1024 / 1024} MB`
-      ); // smaller than maxSizeMB
-    } catch (error) {
-      console.log(error);
+      const photosToDelete: PhotoToUpload[] = oldPhotos
+        .filter((oldPhoto) => !photos.some((photo) => photo.id === oldPhoto.id))
+        .map((p) => ({ ...p, action: "delete" }));
+
+      const photosToCreate: PhotoToUpload[] = photos.filter(
+        (p) => p.action === "create"
+      );
+
+      const photosToEdit: PhotoToUpload[] = photos.filter(
+        (p) => p.action === "edit"
+      );
+
+      // TODO: edit saved photo order
+
+      setPhotosToUpload([...photosToDelete, ...photosToCreate]);
     }
-  }; */
+  };
 
   const handleComponentError = (errs?: ErrorsType) => {
     let trueErrs: string[] = [];
@@ -96,22 +92,26 @@ export const LodgeImageUpload = ({
       errs.minNumber = errorMessages.minNumber;
     }
     setErrors(errs);
-    setIsValid(Object.keys(errs).length === 0);
+    if (Object.keys(errs).length === 0) {
+      getDiff();
+      changeStepValidity(2, true);
+      // nextStep();
+    } else {
+      changeStepValidity(2, false);
+    }
   };
-
-  useEffect(() => {
-    if (submitting) validate();
-  }, [submitting]);
 
   return (
     <div>
+      <h2 className='mb-3'>Fotos</h2>
+      <p>Adicione algumas fotos da acomodação</p>
       <ReactImageUploading
         multiple
         value={photos}
         onChange={onChange}
         maxNumber={maxNumber}
         dataURLKey='url'
-        maxFileSize={1000 * 1000} // 1 MB
+        maxFileSize={200 * 1000} // 200 kB
         acceptType={["jpg", "png"]}
         allowNonImageType={false}
         onError={handleComponentError}
@@ -129,7 +129,7 @@ export const LodgeImageUpload = ({
               {imageList.map((image, index) => (
                 <div key={index} className='image-item'>
                   <img
-                    onClick={() => onImageUpdate(index)}
+                    /* onClick={() => onImageUpdate(index)} */
                     src={image["url"]}
                     alt=''
                     width='100%'
@@ -164,6 +164,24 @@ export const LodgeImageUpload = ({
           <i className='bi bi-x-circle'></i> {error}
         </Alert>
       ))}
+      <div className='d-flex align-items-center justify-content-end my-3 gap-4'>
+        <Button
+          onClick={prevStep}
+          type='button'
+          variant='secondary'
+          className='px-5'
+        >
+          Voltar
+        </Button>
+        <Button
+          onClick={validate}
+          type='button'
+          variant='primary'
+          className='px-5'
+        >
+          {lodgeToEdit ? "Salvar" : "Criar"}
+        </Button>
+      </div>
     </div>
   );
 };

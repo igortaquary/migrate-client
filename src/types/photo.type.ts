@@ -8,4 +8,5 @@ export type PhotoToUpload = {
   id?: string;
   url?: string;
   order: number;
+  action: "create" | "edit" | "delete";
 };

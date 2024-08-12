@@ -1,10 +1,10 @@
 import { ReactElement, useContext, useEffect, useState } from "react";
-import { Gender, Lodge, LodgeType, SpaceType } from "../../types/lodge.types";
+import { Lodge, LodgeType, SpaceType } from "../../types/lodge.types";
 import { Loader } from "../../components/Loader";
 import showNotification from "../../components/GlobalAlert";
 import { Link, useParams } from "react-router-dom";
 import { getLodge, getLodgeContactInfo } from "../../services/lodge.service";
-import { Alert, Breadcrumb, Button, Card, Col, Row } from "react-bootstrap";
+import { Alert, Button, Card, Col, Row } from "react-bootstrap";
 import { Map } from "../../components/Map";
 import { UserContext } from "../../contexts/UserContext";
 import { PhotosCarousel } from "../../components/PhotosCarousel";
@@ -200,6 +200,7 @@ export const LodgePage = () => {
           <Map
             origin={lodge.location}
             destination={lodge.institution?.location}
+            mode={lodge.directionMode}
           />
         ) : (
           <Button

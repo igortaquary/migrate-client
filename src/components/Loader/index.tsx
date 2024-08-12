@@ -1,11 +1,9 @@
 import { Spinner } from "react-bootstrap";
+import "./index.scss";
 
-export const Loader = () => {
+export const Loader = ({ overlay }: { overlay?: boolean }) => {
   return (
-    <div
-      className='h-100 d-flex align-items-center justify-content-center'
-      style={{ margin: "200px 0" }}
-    >
+    <div className={"loader-container " + (overlay ? "overlay" : "h-100 my-5")}>
       <Spinner />
     </div>
   );
