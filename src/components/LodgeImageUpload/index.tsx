@@ -48,25 +48,23 @@ export const LodgeImageUpload = () => {
   };
 
   const getDiff = () => {
-    if (lodgeToEdit?.photos) {
-      const oldPhotos = lodgeToEdit.photos;
+    const oldPhotos = lodgeToEdit?.photos || [];
+    const photosToDelete: PhotoToUpload[] = oldPhotos
+      .filter((oldPhoto) => !photos.some((photo) => photo.id === oldPhoto.id))
+      .map((p) => ({ ...p, action: "delete" }));
 
-      const photosToDelete: PhotoToUpload[] = oldPhotos
-        .filter((oldPhoto) => !photos.some((photo) => photo.id === oldPhoto.id))
-        .map((p) => ({ ...p, action: "delete" }));
+    const photosToCreate: PhotoToUpload[] = photos.filter(
+      (p) => p.action === "create"
+    );
 
-      const photosToCreate: PhotoToUpload[] = photos.filter(
-        (p) => p.action === "create"
-      );
+    const photosToEdit: PhotoToUpload[] = photos.filter(
+      (p) => p.action === "edit"
+    );
 
-      const photosToEdit: PhotoToUpload[] = photos.filter(
-        (p) => p.action === "edit"
-      );
-
-      // TODO: edit saved photo order
-
-      setPhotosToUpload([...photosToDelete, ...photosToCreate]);
-    }
+    // TODO: edit saved photo order
+    const photosToUpload = [...photosToDelete, ...photosToCreate];
+    console.log(photosToUpload);
+    setPhotosToUpload(photosToUpload);
   };
 
   const handleComponentError = (errs?: ErrorsType) => {

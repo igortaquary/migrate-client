@@ -18,7 +18,10 @@ export const Stepper = ({ steps, currentIndex }: IStepper) => {
       <div className='bs-stepper-header' role='tablist'>
         {steps.map((step, i) => (
           <>
-            <div className={`step ${i === currentIndex ? "active" : ""}`}>
+            <div
+              key={i}
+              className={`step ${i === currentIndex ? "active" : ""}`}
+            >
               <div className='step-trigger'>
                 <span className='bs-stepper-circle'>
                   {step.valid ? <i className='bi bi-check'></i> : i + 1}

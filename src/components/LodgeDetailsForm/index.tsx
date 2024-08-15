@@ -205,7 +205,7 @@ export const LodgeDetailsForm = () => {
           <Form.Select
             onChange={(e) => setInstitution(e.target.value)}
             aria-label='Universidade/Campus'
-            value={institutionId || undefined}
+            value={institutionId || ""}
           >
             <option value={""}>Nenhum</option>
             {institutions.map((institution, i) => (
