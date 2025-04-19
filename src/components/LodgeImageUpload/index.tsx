@@ -35,6 +35,10 @@ export const LodgeImageUpload = () => {
   );
   const [errors, setErrors] = useState<IErrors>({});
 
+  useEffect(() => {
+    console.log(photos);
+  }, [photos]);
+
   const onChange = (list: ImageListType) => {
     setPhotos(
       list.map((item, i) => ({
@@ -117,7 +121,6 @@ export const LodgeImageUpload = () => {
         {({
           imageList,
           onImageUpload,
-          onImageUpdate,
           onImageRemove,
           isDragging,
           dragProps,

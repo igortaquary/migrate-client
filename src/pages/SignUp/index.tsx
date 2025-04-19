@@ -6,6 +6,7 @@ import Row from "react-bootstrap/esm/Row";
 import Col from "react-bootstrap/esm/Col";
 import Button from "react-bootstrap/esm/Button";
 import Alert from "react-bootstrap/esm/Alert";
+import politicaDePrivacidade from "../../assets/documents/politica-de-privacidade.pdf";
 
 interface IErrors {
   name?: string;
@@ -14,6 +15,7 @@ interface IErrors {
   phone?: string;
   gender?: string;
   server?: string;
+  policy?: string;
 }
 
 export const SignUp = () => {
@@ -27,6 +29,7 @@ export const SignUp = () => {
   const [name, setName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [gender, setGender] = useState<string>("");
+  const [policy, setPolicy] = useState<boolean>(false);
 
   const validateForm = () => {
     const validationErros: IErrors = {};
@@ -35,6 +38,10 @@ export const SignUp = () => {
     if (!email) validationErros.email = "Preencha o seu email";
     if (!phone) validationErros.phone = "Número de telefone inválido";
     if (password.length < 5) validationErros.password = "Senha muito curta";
+    if (!gender) validationErros.gender = "Selecione o seu gênero";
+    if (!policy)
+      validationErros.policy =
+        "É necessário concordar com os termos de uso e política de privacidade";
 
     setErrors(validationErros);
     return Object.keys(validationErros).length === 0;
@@ -108,12 +115,16 @@ export const SignUp = () => {
               onChange={(e) => setGender(e.target.value)}
               aria-label='Gênero'
               value={gender}
+              isInvalid={!!errors.gender}
             >
               <option>Selecione</option>
               <option value='male'>Homem</option>
               <option value='female'>Mulher</option>
               <option value='other'>Outro</option>
             </Form.Select>
+            <Form.Control.Feedback type='invalid'>
+              {errors.gender}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group as={Col} md='12' className='mb-3'>
             <Form.Label>Telefone</Form.Label>
@@ -159,14 +170,35 @@ export const SignUp = () => {
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className='mb-3'>
-            <Form.Check
+            <Form.Check.Input
               required
-              label='Concordo com os Termos de Uso'
-              feedback='You must agree before submitting.'
-              feedbackType='invalid'
-            />
+              checked={policy}
+              onClick={() => setPolicy(!policy)}
+            ></Form.Check.Input>
+            &nbsp;
+            <Form.Check.Label>
+              Concordo com os
+              <a
+                href='#'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='mx-1'
+              >
+                Termos de Uso
+              </a>
+              e
+              <a
+                href={politicaDePrivacidade}
+                rel='noopener noreferrer'
+                target='_blank'
+                className='mx-1'
+              >
+                Política de Privacidade
+              </a>
+            </Form.Check.Label>
           </Form.Group>
 
+          {!!errors.policy && <Alert variant='danger'>{errors.policy}</Alert>}
           {!!errors.server && <Alert variant='danger'>{errors.server}</Alert>}
 
           <div className='d-flex justify-content-center my-3'>
