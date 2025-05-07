@@ -14,7 +14,7 @@ const renderGender = (gender: string) => {
   return {
     male: "Apenas homens",
     female: "Apenas homens",
-    any: "Qualquer",
+    any: "",
   }[gender];
 };
 

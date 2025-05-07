@@ -36,6 +36,7 @@ export const SearchFilters = () => {
     if (type) params.type = type;
     if (gender) params.gender = gender;
     if (state) params.state = state;
+    if (institutionId) params.institutionId = institutionId;
 
     setSearchParams(params);
   };
