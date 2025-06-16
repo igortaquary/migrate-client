@@ -138,9 +138,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           <div className='mb-3'>
             <b>Você precisa estar logado para realizar essa ação.</b>
           </div>
-          <a href='/login' className='btn btn-primary'>
-            entrar
+          <a href='/login' className='btn btn-primary px-5 mb-3'>
+            Entrar
           </a>
+          <div>
+
+          <button
+            className='btn btn-link'
+            onClick={() => setShowModal(false)}
+            >
+            Cancelar
+          </button>
+            </div>
         </Modal.Body>
       </Modal>
     </UserContext.Provider>

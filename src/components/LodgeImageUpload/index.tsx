@@ -114,7 +114,7 @@ export const LodgeImageUpload = () => {
         maxNumber={maxNumber}
         dataURLKey='url'
         maxFileSize={200 * 1000} // 200 kB
-        acceptType={["jpg", "png"]}
+        acceptType={["jpg", "jpeg", "png"]}
         allowNonImageType={false}
         onError={handleComponentError}
       >
