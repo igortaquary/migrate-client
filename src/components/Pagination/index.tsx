@@ -1,4 +1,5 @@
 export interface IPagination {
+  count?: number;
   currentPage: number;
   nextPage: number;
   prevPage: number;
@@ -29,7 +30,7 @@ export const Pagination = ({
             onClick={() => handlePageChange(prevPage)}
             disabled={!prevPage}
           >
-            &#11207;
+            <i className='bi bi-caret-left-fill'></i>
           </button>
         </li>
 
@@ -51,7 +52,7 @@ export const Pagination = ({
             onClick={() => handlePageChange(nextPage)}
             disabled={!nextPage}
           >
-            &#11208;
+            <i className='bi bi-caret-right-fill'></i>
           </button>
         </li>
       </ul>

@@ -94,18 +94,20 @@ export const Home = () => {
           </div>
           <div className='col-md-6'>
             <h4>Acomodações por UF</h4>
-            <div
-              style={{
-                overflowWrap: "break-word",
-              }}
-            >
+            <p>
               {BR_STATES.map((state, i) => (
                 <span key={i}>
-                  <Link to={"/lodges?state=" + state}>{state}</Link>
-                  &nbsp;&nbsp;
+                  <Link key={i} to={"/lodges?state=" + state}>
+                    {state}
+                  </Link>
+                  {
+                    i < BR_STATES.length - 1
+                      ? " | "
+                      : "" /* Add comma except for last item */
+                  }
                 </span>
               ))}
-            </div>
+            </p>
           </div>
         </div>
       </section>

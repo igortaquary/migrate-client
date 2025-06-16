@@ -12,6 +12,7 @@ export const Lodges = () => {
 
   const [lodges, setLodges] = useState([]);
   const [pageData, setPageData] = useState<IPagination>({
+    count: 0,
     currentPage: 1,
     lastPage: 0,
     nextPage: 0,
@@ -22,7 +23,6 @@ export const Lodges = () => {
   const handleSearch = async () => {
     const result = await searchLodges(searchParams);
     setLodges(result.data.data);
-    console.log(result.data);
 
     setPageData(result.data);
     setLoading(false);
@@ -38,7 +38,12 @@ export const Lodges = () => {
     <main>
       <h1 className='my-3'>Acomodações</h1>
       <SearchFilters />
-      {}
+      <div>
+        <p className='text-muted'>
+          Exibindo {lodges.length} de {pageData.count}{" "}
+          {lodges.length === 1 ? "acomodação" : "acomodações"} encontradas
+        </p>
+      </div>
       {lodges.length ? (
         <div className='lodges-grid mb-4'>
           {lodges.map((lodge, i) => (

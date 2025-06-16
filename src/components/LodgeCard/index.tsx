@@ -13,8 +13,8 @@ interface ILodgeCard extends Lodge {
 const renderGender = (gender: string) => {
   return {
     male: "Apenas homens",
-    female: "Apenas homens",
-    any: "",
+    female: "Apenas mulheres",
+    any: "Aceita homens e mulheres",
   }[gender];
 };
 
@@ -30,11 +30,13 @@ export const LodgeCard = ({ lodge }: { lodge: ILodgeCard }) => {
     <Card className='lodge-card' onClick={() => navigate("/lodge/" + lodge.id)}>
       <Card.Body>
         <Card.Img src={imgUrl}></Card.Img>
-        <Card.Title>{lodge.title}</Card.Title>
+        <Card.Title className='mt-3'>{lodge.title}</Card.Title>
         <Card.Text className='description'>{lodge.description}</Card.Text>
-        {renderGender(lodge.gender)}
       </Card.Body>
-      <Card.Footer>{lodge.institution?.name}</Card.Footer>
+      <Card.Footer>
+        <div>{renderGender(lodge.gender)}</div>
+        <div>{lodge.institution?.name}</div>
+      </Card.Footer>
     </Card>
   );
 };

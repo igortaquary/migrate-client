@@ -19,6 +19,9 @@ export const SearchFilters = () => {
 
   const [institutions, setInstitutions] = useState<Institution[]>([]);
 
+  const [textSearch, setTextSearch] = useState(
+    searchParams.get("textSearch") || ""
+  );
   const [space, setSpace] = useState(searchParams.get("space") || "");
   const [type, setType] = useState(searchParams.get("type") || "");
   const [gender, setGender] = useState(searchParams.get("gender") || "");
@@ -31,6 +34,7 @@ export const SearchFilters = () => {
     const params: any = {};
 
     const page = searchParams.get("page");
+    if (textSearch) params.textSearch = textSearch.trim();
     if (page) params.page = page;
     if (space) params.space = space;
     if (type) params.type = type;
@@ -53,6 +57,16 @@ export const SearchFilters = () => {
   return (
     <Card className='p-3 mb-4'>
       <Row className='row-gap-3'>
+        <Form.Group as={Col} lg='12' md='12' sm='12'>
+          <Form.FloatingLabel label='Buscar'>
+            <Form.Control
+              type='text'
+              placeholder='Buscar por nome ou descrição'
+              value={textSearch}
+              onChange={(e) => setTextSearch(e.target.value)}
+            />
+          </Form.FloatingLabel>
+        </Form.Group>
         <Form.Group as={Col} lg='2' md='4' sm='6'>
           <Form.FloatingLabel label='Instituição'>
             <Form.Select
