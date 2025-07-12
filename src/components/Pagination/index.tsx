@@ -16,8 +16,6 @@ export const Pagination = ({
   setSearchParams: (a: any) => void;
 }) => {
   const handlePageChange = (page: number) => {
-    console.log("handlePageChange");
-
     setSearchParams((prev: any) => ({ ...prev, page }));
   };
   return (
